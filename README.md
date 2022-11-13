@@ -4,6 +4,37 @@
 
 ### Gavin Simpson
 
+#### R and Packages
+
+##### Install R
+
+Install R, ideally version 4.2.2 (latest), but anything 4.1.0 or later should work. Download R from <https://cran.r-project.org/> and install it.
+
+##### Install RStudio
+
+Install RStudio. Download RStudio from <https://posit.co/download/rstudio-desktop/> and install it.
+
+##### Update & install packages
+```r
+# update packages
+cores <- parallel::detectCores() - 1
+update.packages(ask = FALSE, Ncpus = cores)
+
+# install new packaes
+pkgs <- c("gapminder", "tidyverse", "readr", "readxl", "tidypaleo", "rioja",
+    "analogue", "vegan", "pangaear", "janitor", "palmerpenguins")
+
+install.packages(pkgs, Ncpus = cores)
+
+# install some dev packages
+options(repos = c(
+    gavinsimpson = 'https://gavinsimpson.r-universe.dev',
+    nsj3 = "https://nsj3.r-universe.dev",
+    CRAN = "https://cloud.r-project.org"))
+
+install.packages(c("riojaPlot", "gratia"), Ncpus = cores)
+```
+
 ## Slides
 
 ### Monday
