@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Data wrangling with dplyr 📦</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Gavin Simpson" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../common/css/all.css" type="text/css" />
+    <link rel="stylesheet" href="../common/css/slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: inverse, middle, left, my-title-slide, title-slide
+
+.title[
+# Data wrangling with dplyr 📦
+]
+.subtitle[
+## ACME Workshop
+]
+.author[
+### Gavin Simpson
+]
+
+---
+
+
+
+
+
+---
+class: inverse middle center subsection
+
+# Data wrangling with **dplyr** 📦
+
+---
+
+# Data wrangling
+
+Wrangling data is (or should be) the most time-consuming aspect of a study &amp;mdash; once collected!
+
+.row[
+
+.col-7[
+*Wrangling* defined as
+
+&gt; engagement in a long, complicated dispute or argument
+
+&gt; round up, herd, or take charge of (livestock)
+
+&gt; alternative to *wangle*, to *manage to obtain (something) by persuading or cleverly manipulating someone*
+
+]
+
+.col-1[
+&amp;nbsp;
+]
+
+.col-4[
+Better alternative to
+
+* data processing
+* data munging
+* data manipulation
+* &amp;hellip;
+]
+]
+
+---
+
+# Data wrangling and *dplyr*
+
+The *dplyr* package provides **five** key functions to solve most of the data wrangling issues you'll face
+
+1. Choose observations (rows) based on values of variables (cols) &amp;mdash; `filter()`
+2. Reorder the observations (rows) &amp;mdash; `arrange()`
+3. Choose variables by name or other feature &amp;mdash; `select()`
+4. Create new variables as functions of existing ones &amp;mdash; `mutate()`
+5. Collapse many values into a single summary &amp;mdash; `summarise()`
+
+Each of these functions can be used with `group_by()` so that they affect each subset of data (group) in turn
+
+These are the key data wrangling *verbs*
+
+---
+
+# Guiding principles
+
+All verbs work in the same way, providing a consistent workflow with known outputs
+
+1. the first argument to the verbs is *always* a data frame
+
+2. subsequent arguments define what you want to with the data frame
+
+3. the result of each verb (what is returned by the function) is *always* a data frame
+
+---
+
+# Global burden of dinocyst
+
+
+```r
+dino &lt;- read_excel(here("data", "dinocyst-meta.xlsx"), skip = 2,
+    na = c("", "---", "-----"))
+```
+
+
+```r
+dino
+```
+
+```
+## # A tibble: 1,968 × 12
+##    `Site number` Latit…¹ Longi…² Lab I…³ Cruis…⁴ corin…⁵ Depth…⁶ Dinoc…⁷ Dinoc…⁸
+##    &lt;chr&gt;           &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;  
+##  1 E003             48.2   -69.5 UQP-30… Pétrel… Box co… surface     179 527    
+##  2 E004             48.2   -69.6 UQP-29… Pétrel… Box co… surface      92 299    
+##  3 E005             48.2   -69.3 UQP-30… Pétrel… Box co… surface     162 229    
+##  4 E006             48.3   -69.4 UQP-30… Pétrel… Box co… surface     140 470    
+##  5 E007             48.3   -69.4 UQP-30… Pétrel… Box co… surface     205 570    
+##  6 E008             48.3   -69.3 UQP-19… Lauzie… Gravit… surface     173 1845   
+##  7 E010             48.5   -69.0 UQP-29… Lauzie… Box co… surface      94 224    
+##  8 E012             48.6   -68.5 UQP-30… Pétrel… Box co… surface     171 425    
+##  9 E013             48.8   -68.6 UQP-30… Pétrel… Box co… surface     303 1692   
+## 10 E014             48.9   -68.7 UQP-29… Pétrel… Box co… surface     284 1440   
+## # … with 1,958 more rows, 3 more variables: `Dinocyst conc./g` &lt;chr&gt;,
+## #   Analyst &lt;chr&gt;, Reference &lt;chr&gt;, and abbreviated variable names ¹​Latitude,
+## #   ²​Longitude, ³​`Lab ID`, ⁴​`Cruise and Core number`, ⁵​`coring device`,
+## #   ⁶​`Depth (cm)`, ⁷​`Dinocyst count`, ⁸​`Dinocyst conc./cm3`
+```
+
+---
+
+# Clean up column names
+
+
+```r
+library("janitor")
+dino &lt;- dino %&gt;% janitor::clean_names()
+names(dino)
+```
+
+```
+##  [1] "site_number"            "latitude"               "longitude"             
+##  [4] "lab_id"                 "cruise_and_core_number" "coring_device"         
+##  [7] "depth_cm"               "dinocyst_count"         "dinocyst_conc_cm3"     
+## [10] "dinocyst_conc_g"        "analyst"                "reference"
+```
+
+---
+
+# `filter()`
+
+Subset observations based on the values or one or more of the columns
+
+
+```r
+filter(dino, coring_device == "Box corer")
+```
+
+```
+## # A tibble: 341 × 12
+##    site_number latitude longitude lab_id cruis…¹ corin…² depth…³ dinoc…⁴ dinoc…⁵
+##    &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;  
+##  1 E003            48.2     -69.5 UQP-3… Pétrel… Box co… surface     179 527    
+##  2 E004            48.2     -69.6 UQP-2… Pétrel… Box co… surface      92 299    
+##  3 E005            48.2     -69.3 UQP-3… Pétrel… Box co… surface     162 229    
+##  4 E006            48.3     -69.4 UQP-3… Pétrel… Box co… surface     140 470    
+##  5 E007            48.3     -69.4 UQP-3… Pétrel… Box co… surface     205 570    
+##  6 E010            48.5     -69.0 UQP-2… Lauzie… Box co… surface      94 224    
+##  7 E012            48.6     -68.5 UQP-3… Pétrel… Box co… surface     171 425    
+##  8 E013            48.8     -68.6 UQP-3… Pétrel… Box co… surface     303 1692   
+##  9 E014            48.9     -68.7 UQP-2… Pétrel… Box co… surface     284 1440   
+## 10 E015            48.7     -68.1 UQP-3… Pétrel… Box co… surface     253 668    
+## # … with 331 more rows, 3 more variables: dinocyst_conc_g &lt;chr&gt;, analyst &lt;chr&gt;,
+## #   reference &lt;chr&gt;, and abbreviated variable names ¹​cruise_and_core_number,
+## #   ²​coring_device, ³​depth_cm, ⁴​dinocyst_count, ⁵​dinocyst_conc_cm3
+```
+
+---
+
+# The pipe `%&gt;%`
+
+The nature of *dplyr* verbs leads to a workflow where we create intermediate steps
+
+1. group the data using `group_by()`
+2. summarise the grouped data by group using `summarise()`
+
+We perhaps don't need to store the output of the first operation
+
+The pipe operator `%&gt;%` allows use to compose *dplyr* verbs into a workflow to achieve a data wrangling outcome
+
+---
+
+# Plot
+
+
+```r
+dino_box &lt;- dino %&gt;%
+    filter(coring_device == "Box corer")
+dino_box
+```
+
+```
+## # A tibble: 341 × 12
+##    site_number latitude longitude lab_id cruis…¹ corin…² depth…³ dinoc…⁴ dinoc…⁵
+##    &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;  
+##  1 E003            48.2     -69.5 UQP-3… Pétrel… Box co… surface     179 527    
+##  2 E004            48.2     -69.6 UQP-2… Pétrel… Box co… surface      92 299    
+##  3 E005            48.2     -69.3 UQP-3… Pétrel… Box co… surface     162 229    
+##  4 E006            48.3     -69.4 UQP-3… Pétrel… Box co… surface     140 470    
+##  5 E007            48.3     -69.4 UQP-3… Pétrel… Box co… surface     205 570    
+##  6 E010            48.5     -69.0 UQP-2… Lauzie… Box co… surface      94 224    
+##  7 E012            48.6     -68.5 UQP-3… Pétrel… Box co… surface     171 425    
+##  8 E013            48.8     -68.6 UQP-3… Pétrel… Box co… surface     303 1692   
+##  9 E014            48.9     -68.7 UQP-2… Pétrel… Box co… surface     284 1440   
+## 10 E015            48.7     -68.1 UQP-3… Pétrel… Box co… surface     253 668    
+## # … with 331 more rows, 3 more variables: dinocyst_conc_g &lt;chr&gt;, analyst &lt;chr&gt;,
+## #   reference &lt;chr&gt;, and abbreviated variable names ¹​cruise_and_core_number,
+## #   ²​coring_device, ³​depth_cm, ⁴​dinocyst_count, ⁵​dinocyst_conc_cm3
+```
+
+---
+
+
+```r
+ggplot(dino_box, aes(x = longitude, y = latitude, fill = dinocyst_count)) +
+    geom_point() +
+    theme(legend.position = "top") +
+    labs(x = "longitude", y = "latitude", fill = NULL) +
+    coord_map(projection = "orthographic",
+        orientation = c(40, -20, 0))
+```
+
+![](04-data-wrangling_files/figure-html/gbd-2017-plot-1.svg)&lt;!-- --&gt;
+
+---
+
+# `arrange()`
+
+Sort the rows according to a condition or variable
+
+
+```r
+arrange(dino, dinocyst_count)
+```
+
+```
+## # A tibble: 1,968 × 12
+##    site_number latitude longitude lab_id cruis…¹ corin…² depth…³ dinoc…⁴ dinoc…⁵
+##    &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;  
+##  1 2189            68.9    -59.3  3463-2 GeoB 2… Box co… Surface      27 &lt;NA&gt;   
+##  2 B2132           70.3    -66.1  503366 Statio… Box co… surface      30 &lt;NA&gt;   
+##  3 L2128           59.0    -63.9  501481 Statio… Box co… surface      31 &lt;NA&gt;   
+##  4 Z2134           74.1    -83.4  503427 Statio… Box co… surface      49 &lt;NA&gt;   
+##  5 Y2055           80.5     -8.49 3298-3 PS93-0… &lt;NA&gt;    surface      59 2200   
+##  6 M1087           38.2     13.1  282/1  KET82-… &lt;NA&gt;    surface      60 453.59…
+##  7 X1749           19.0    -94.7  2885-1 GDM-11… &lt;NA&gt;    surface      60 &lt;NA&gt;   
+##  8 Z726            77.1    -89.5  ISMER  JOS 17… &lt;NA&gt;    surface      61 672    
+##  9 M1062           40.1      1.35 273/8  SU81-01 &lt;NA&gt;    surface      61 272.16…
+## 10 P1268           32.8   -118.   2100-2 48      &lt;NA&gt;    surface      64 &lt;NA&gt;   
+## # … with 1,958 more rows, 3 more variables: dinocyst_conc_g &lt;chr&gt;,
+## #   analyst &lt;chr&gt;, reference &lt;chr&gt;, and abbreviated variable names
+## #   ¹​cruise_and_core_number, ²​coring_device, ³​depth_cm, ⁴​dinocyst_count,
+## #   ⁵​dinocyst_conc_cm3
+```
+
+---
+
+# `desc()`
+
+Arrange in descending order using `desc()`
+
+
+```r
+arrange(dino, desc(dinocyst_count))
+```
+
+```
+## # A tibble: 1,968 × 12
+##    site_number latitude longitude lab_id cruis…¹ corin…² depth…³ dinoc…⁴ dinoc…⁵
+##    &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;  
+##  1 N230            65.2     -9.53 UQP-7… 16184   Box co… surface    4012 175.81…
+##  2 J353            67.9    -18.4  Kiel   PO-158… Box co… surface    2906 &lt;NA&gt;   
+##  3 J360            68.2    -18.3  Kiel   PO-158… Box co… surface    2541 &lt;NA&gt;   
+##  4 J312            72.0      4.99 Kiel   23267   Box co… surface    2233 &lt;NA&gt;   
+##  5 J307            72.1     11.4  Kiel   23260   Box co… surface    2096 &lt;NA&gt;   
+##  6 A939            66.7    -16.8  &lt;NA&gt;   2674    &lt;NA&gt;    surface    2081 12425.…
+##  7 Z1390           72.0     22.0  900/1… HM St 1 &lt;NA&gt;    surface    1950 &lt;NA&gt;   
+##  8 J305            75       14.0  Kiel   23258   Box co… surface    1824 &lt;NA&gt;   
+##  9 J311            72.0      7.49 Kiel   23266   Box co… surface    1732 &lt;NA&gt;   
+## 10 J310            71.2     15.8  Kiel   23264   Box co… surface    1682 &lt;NA&gt;   
+## # … with 1,958 more rows, 3 more variables: dinocyst_conc_g &lt;chr&gt;,
+## #   analyst &lt;chr&gt;, reference &lt;chr&gt;, and abbreviated variable names
+## #   ¹​cruise_and_core_number, ²​coring_device, ³​depth_cm, ⁴​dinocyst_count,
+## #   ⁵​dinocyst_conc_cm3
+```
+
+---
+
+# `select()`
+
+Choose which variables to view or work with
+
+
+```r
+select(dino, c(latitude, longitude, dinocyst_count))
+```
+
+```
+## # A tibble: 1,968 × 3
+##    latitude longitude dinocyst_count
+##       &lt;dbl&gt;     &lt;dbl&gt;          &lt;dbl&gt;
+##  1     48.2     -69.5            179
+##  2     48.2     -69.6             92
+##  3     48.2     -69.3            162
+##  4     48.3     -69.4            140
+##  5     48.3     -69.4            205
+##  6     48.3     -69.3            173
+##  7     48.5     -69.0             94
+##  8     48.6     -68.5            171
+##  9     48.8     -68.6            303
+## 10     48.9     -68.7            284
+## # … with 1,958 more rows
+```
+
+---
+
+# `select()` &amp;mdash; many options for selecting
+
+.row[
+
+.col-6[
+
+`matches()`
+
+
+```r
+select(dino, matches("dinocyst"))
+```
+
+```
+## # A tibble: 1,968 × 3
+##    dinocyst_count dinocyst_conc_cm3 dinocyst_conc_g
+##             &lt;dbl&gt; &lt;chr&gt;             &lt;chr&gt;          
+##  1            179 527               &lt;NA&gt;           
+##  2             92 299               &lt;NA&gt;           
+##  3            162 229               &lt;NA&gt;           
+##  4            140 470               &lt;NA&gt;           
+##  5            205 570               &lt;NA&gt;           
+##  6            173 1845              &lt;NA&gt;           
+##  7             94 224               &lt;NA&gt;           
+##  8            171 425               &lt;NA&gt;           
+##  9            303 1692              &lt;NA&gt;           
+## 10            284 1440              &lt;NA&gt;           
+## # … with 1,958 more rows
+```
+]
+
+.col-6[
+
+`last_col()`
+
+
+```r
+select(dino, last_col())
+```
+
+```
+## # A tibble: 1,968 × 1
+##    reference          
+##    &lt;chr&gt;              
+##  1 Rochon et al., 1999
+##  2 Rochon et al., 1999
+##  3 Rochon et al., 1999
+##  4 Rochon et al., 1999
+##  5 Rochon et al., 1999
+##  6 Rochon et al., 1999
+##  7 Rochon et al., 1999
+##  8 Rochon et al., 1999
+##  9 Rochon et al., 1999
+## 10 Rochon et al., 1999
+## # … with 1,958 more rows
+```
+]
+]
+
+---
+
+# `select()` &amp;mdash; many options for selecting
+
+.row[
+
+.col-6[
+
+`from:to`
+
+
+```r
+select(dino, latitude:coring_device)
+```
+
+```
+## # A tibble: 1,968 × 5
+##    latitude longitude lab_id    cruise_and_core_number coring_device
+##       &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;                  &lt;chr&gt;        
+##  1     48.2     -69.5 UQP-300-2 Pétrel-88/E2           Box corer    
+##  2     48.2     -69.6 UQP-294-6 Pétrel-88/E3           Box corer    
+##  3     48.2     -69.3 UQP-300-4 Pétrel-88/F1           Box corer    
+##  4     48.3     -69.4 UQP-300-5 Pétrel-88/F2           Box corer    
+##  5     48.3     -69.4 UQP-300-6 Pétrel-88/F3           Box corer    
+##  6     48.3     -69.3 UQP-196-1 Lauzier-85/11          Gravity corer
+##  7     48.5     -69.0 UQP-295-3 Lauzier-85/G2          Box corer    
+##  8     48.6     -68.5 UQP-301-3 Pétrel-88/H1           Box corer    
+##  9     48.8     -68.6 UQP-301-4 Pétrel-88/H2           Box corer    
+## 10     48.9     -68.7 UQP-295-5 Pétrel-88/H3           Box corer    
+## # … with 1,958 more rows
+```
+]
+
+.col-6[
+
+`starts_with()`
+
+
+```r
+select(dino, starts_with("l"))
+```
+
+```
+## # A tibble: 1,968 × 3
+##    latitude longitude lab_id   
+##       &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;    
+##  1     48.2     -69.5 UQP-300-2
+##  2     48.2     -69.6 UQP-294-6
+##  3     48.2     -69.3 UQP-300-4
+##  4     48.3     -69.4 UQP-300-5
+##  5     48.3     -69.4 UQP-300-6
+##  6     48.3     -69.3 UQP-196-1
+##  7     48.5     -69.0 UQP-295-3
+##  8     48.6     -68.5 UQP-301-3
+##  9     48.8     -68.6 UQP-301-4
+## 10     48.9     -68.7 UQP-295-5
+## # … with 1,958 more rows
+```
+]
+]
+
+---
+
+# `select()` &amp;mdash; many options for selecting
+
+Many options for choosing columns in `select` &amp;mdash; see `?dplyr::select`
+
+---
+
+# `summarise()`
+
+Summarise data to a single row
+
+
+```r
+dino %&gt;% summarise(total_cysts = sum(dinocyst_count, na.rm = TRUE))
+```
+
+```
+## # A tibble: 1 × 1
+##   total_cysts
+##         &lt;dbl&gt;
+## 1      620822
+```
+
+---
+
+# `group_by()`
+
+`summarise()` becomes much more useful if we group data first
+
+
+```r
+dino %&gt;%
+    group_by(coring_device) %&gt;%
+    summarise(total_cysts = sum(dinocyst_count, na.rm = TRUE))
+```
+
+```
+## # A tibble: 22 × 2
+##    coring_device   total_cysts
+##    &lt;chr&gt;                 &lt;dbl&gt;
+##  1 box corer             28298
+##  2 Box corer            159671
+##  3 box-core                  0
+##  4 Box-corer              1234
+##  5 boxe corer                0
+##  6 Ekman grab             3966
+##  7 GOMEX box corer       13140
+##  8 grab                   6843
+##  9 Grab                  27429
+## 10 Gravity core            101
+## # … with 12 more rows
+```
+
+Can group by multiple variables; grouping applied in the order given
+
+---
+
+# `mutate()`
+
+Create new variable or modify existing ones
+
+
+```r
+dino %&gt;%
+    group_by(coring_device) %&gt;%
+    summarise(count_per_device = sum(dinocyst_count, na.rm = TRUE)) %&gt;%
+*   mutate(total_count = sum(count_per_device)) %&gt;%
+    ungroup()
+```
+
+```
+## # A tibble: 22 × 3
+##    coring_device   count_per_device total_count
+##    &lt;chr&gt;                      &lt;dbl&gt;       &lt;dbl&gt;
+##  1 box corer                  28298      620822
+##  2 Box corer                 159671      620822
+##  3 box-core                       0      620822
+##  4 Box-corer                   1234      620822
+##  5 boxe corer                     0      620822
+##  6 Ekman grab                  3966      620822
+##  7 GOMEX box corer            13140      620822
+##  8 grab                        6843      620822
+##  9 Grab                       27429      620822
+## 10 Gravity core                 101      620822
+## # … with 12 more rows
+```
+
+---
+class: inverse middle center subsection
+
+# Tidying data with *tidyr*
+
+---
+
+# Tidy data
+
+&gt; Tidy datasets provide a standardized way to link the structure of a dataset (its physical layout) with its semantics (its meaning). &amp;ndash; **Hadley Wickham**
+
+A way to arrange data that facilitates subsequent exploration, transformation, visualization, &amp; modelling of the data where
+
+* each column is a variable
+* each row is observation
+
+---
+
+# Wide or long?
+
+Often store species data in wide format
+
+
+```
+## # A tibble: 1,968 × 72
+##    site   Aand  Atax  Btep  Bspo  Iacu  Ipal  Ipar  Ipat  Isph  Istr  Ipli  Ivel
+##    &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1 E003      0 0      0        0     0     0     0     0     0     0     0     0
+##  2 E004      0 0      1.09     0     0     0     0     0     0     0     0     0
+##  3 E005      0 0      0        0     0     0     0     0     0     0     0     0
+##  4 E006      0 0.714  0        0     0     0     0     0     0     0     0     0
+##  5 E007      0 0.488  0        0     0     0     0     0     0     0     0     0
+##  6 E008      0 0      0        0     0     0     0     0     0     0     0     0
+##  7 E010      0 0      0        0     0     0     0     0     0     0     0     0
+##  8 E012      0 0      0        0     0     0     0     0     0     0     0     0
+##  9 E013      0 0      0        0     0     0     0     0     0     0     0     0
+## 10 E014      0 0      0        0     0     0     0     0     0     0     0     0
+## # … with 1,958 more rows, and 59 more variables: Ijap &lt;dbl&gt;, Lmac &lt;dbl&gt;,
+## #   Mcho &lt;dbl&gt;, Nlab &lt;dbl&gt;, Nrig &lt;dbl&gt;, Ocen &lt;dbl&gt;, Oisr &lt;dbl&gt;, Ojan &lt;dbl&gt;,
+## #   Olon &lt;dbl&gt;, Ogig &lt;dbl&gt;, Pzoh &lt;dbl&gt;, Pret &lt;dbl&gt;, Smem &lt;dbl&gt;, Sdel &lt;dbl&gt;,
+## #   Selo &lt;dbl&gt;, Sram &lt;dbl&gt;, Sbel &lt;dbl&gt;, Sben &lt;dbl&gt;, Sbul &lt;dbl&gt;, Slaz &lt;dbl&gt;,
+## #   Smir &lt;dbl&gt;, Sgra &lt;dbl&gt;, Spac &lt;dbl&gt;, Sspp &lt;dbl&gt;, Tpel &lt;dbl&gt;, Pdal &lt;dbl&gt;,
+## #   Stri &lt;dbl&gt;, Imin &lt;dbl&gt;, Imic &lt;dbl&gt;, Ibre &lt;dbl&gt;, Ekar &lt;dbl&gt;, Bspp &lt;dbl&gt;,
+## #   Dubr &lt;dbl&gt;, Peri &lt;dbl&gt;, Lspp &lt;dbl&gt;, Snep &lt;dbl&gt;, Xxan &lt;dbl&gt;, Squa &lt;dbl&gt;, …
+```
+
+---
+
+Look at an alternative way of storing the rectangular data
+
+
+```
+## # A tibble: 139,728 × 3
+##    site  taxon count
+##    &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt;
+##  1 E003  Aand      0
+##  2 E003  Atax      0
+##  3 E003  Btep      0
+##  4 E003  Bspo      0
+##  5 E003  Iacu      0
+##  6 E003  Ipal      0
+##  7 E003  Ipar      0
+##  8 E003  Ipat      0
+##  9 E003  Isph      0
+## 10 E003  Istr      0
+## # … with 139,718 more rows
+```
+
+---
+
+# Wide or long?
+
+The data are also in what we call wide format &amp;mdash; where multiple observations are in a row
+
+To fit a statistical model we need them in long format &amp;mdash; where each row corresponds to a single observation
+
+---
+
+# Wide or long?
+
+&lt;img src="resources/original-dfs-tidy.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Pivoting
+
+Converting between a *wide* and *long* representations is called *pivoting*
+
+&lt;img src="resources/tidyr-longer-wider.gif" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# `pivot_longer()`
+
+To go from the wide version of `dino_wide` to the long form we use `pivot_longer()`
+
+
+```r
+dino_wide %&gt;%
+    pivot_longer(cols = Aand:Dcha, # which columns to pivot
+        names_to = "taxon",        # variables to create in long form
+        values_to = "count")       # column to put the data into
+```
+
+```
+## # A tibble: 139,728 × 3
+##    site  taxon count
+##    &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt;
+##  1 E003  Aand      0
+##  2 E003  Atax      0
+##  3 E003  Btep      0
+##  4 E003  Bspo      0
+##  5 E003  Iacu      0
+##  6 E003  Ipal      0
+##  7 E003  Ipar      0
+##  8 E003  Ipat      0
+##  9 E003  Isph      0
+## 10 E003  Istr      0
+## # … with 139,718 more rows
+```
+
+---
+
+# `pivot_wider()`
+
+Wider forms of data tend to be easier for humans to work with outside R
+
+
+
+```r
+dino_long %&gt;%
+    pivot_wider(names_from = taxon,      # which columns to spread out
+                values_from = count) %&gt;% # which column to take data from
+    head()                               # show just first 6 rows
+```
+
+```
+## # A tibble: 6 × 72
+##   site   Aand  Atax  Btep  Bspo  Iacu  Ipal  Ipar  Ipat  Isph  Istr  Ipli  Ivel
+##   &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 E003      0 0      0        0     0     0     0     0     0     0     0     0
+## 2 E004      0 0      1.09     0     0     0     0     0     0     0     0     0
+## 3 E005      0 0      0        0     0     0     0     0     0     0     0     0
+## 4 E006      0 0.714  0        0     0     0     0     0     0     0     0     0
+## 5 E007      0 0.488  0        0     0     0     0     0     0     0     0     0
+## 6 E008      0 0      0        0     0     0     0     0     0     0     0     0
+## # … with 59 more variables: Ijap &lt;dbl&gt;, Lmac &lt;dbl&gt;, Mcho &lt;dbl&gt;, Nlab &lt;dbl&gt;,
+## #   Nrig &lt;dbl&gt;, Ocen &lt;dbl&gt;, Oisr &lt;dbl&gt;, Ojan &lt;dbl&gt;, Olon &lt;dbl&gt;, Ogig &lt;dbl&gt;,
+## #   Pzoh &lt;dbl&gt;, Pret &lt;dbl&gt;, Smem &lt;dbl&gt;, Sdel &lt;dbl&gt;, Selo &lt;dbl&gt;, Sram &lt;dbl&gt;,
+## #   Sbel &lt;dbl&gt;, Sben &lt;dbl&gt;, Sbul &lt;dbl&gt;, Slaz &lt;dbl&gt;, Smir &lt;dbl&gt;, Sgra &lt;dbl&gt;,
+## #   Spac &lt;dbl&gt;, Sspp &lt;dbl&gt;, Tpel &lt;dbl&gt;, Pdal &lt;dbl&gt;, Stri &lt;dbl&gt;, Imin &lt;dbl&gt;,
+## #   Imic &lt;dbl&gt;, Ibre &lt;dbl&gt;, Ekar &lt;dbl&gt;, Bspp &lt;dbl&gt;, Dubr &lt;dbl&gt;, Peri &lt;dbl&gt;,
+## #   Lspp &lt;dbl&gt;, Snep &lt;dbl&gt;, Xxan &lt;dbl&gt;, Squa &lt;dbl&gt;, Pnud &lt;dbl&gt;, Tapp &lt;dbl&gt;, …
+```
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

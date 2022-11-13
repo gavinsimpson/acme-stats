@@ -1,0 +1,466 @@
+---
+title: "Importing data"
+subtitle: "ACME Workshop"
+author: "Gavin Simpson"
+output:
+  xaringan::moon_reader:
+    css: ['default', 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css', '../common/css/all.css', '../common/css/slides.css']
+    lib_dir: libs
+    nature:
+      titleSlideClass: ['inverse','middle','left',my-title-slide]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: 'macros.js'
+      ratio: '16:9'
+---
+
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(cache = TRUE, dev = 'svg', echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.height=6, fig.width = 1.777777*6)
+library('dplyr')
+library('tibble')
+library('readr')
+library('readxl')
+library("here")
+
+dinocyst <- read_excel(here("data/dinocyst.xlsx"), range = "A3:BT1971")
+```
+
+---
+class: inverse middle center subsection
+
+# The Tidyverse
+
+---
+
+# The Tidyverse
+
+.row[
+
+.col-9[
+> The tidyverse is an opinionated collection of R packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures. &mdash; **www.tidyverse.org**
+
+]
+
+.col-3[
+.center[
+```{r echo = FALSE}
+knitr::include_graphics('./resources/tidyverse-logo.png')
+```
+]
+
+]
+
+]
+
+---
+
+# The Tidyverse
+
+A meta package that installs a core set of the tidyverse packages
+
+* **ggplot2** &mdash; graphics & data viz following *The Grammar of Graphics*
+* **dplyr** &mdash; a grammar of data manipulation
+* **tidyr** &mdash; functions to achieve a zen-like tidy state in your data 🧘
+* **readr** &mdash; fast, friendly ways to read rectangular data (`.csv`, `.tsv`, `.fwf`)
+* **purrr** &mdash; enhanced functional programming replacing explicit loops
+* **tibble** &mdash; a modern reimgaining of the data frame
+* **stringr** &mdash; for working with strings in an easy manner
+* **forcats** &mdash; for working with factors & categorical variables
+
+---
+
+# The Tidyverse
+
+Addresses stages in the data science workflow
+
+```{r r4ds-data-science-img, echo = FALSE, fig.align = 'center'}
+knitr::include_graphics(here("01-monday", 'resources', 'r4ds-data-science.png'))
+```
+
+.references[Wickham & Grolemund (2017) [R for Data Science](https://r4ds.had.co.nz/)]
+
+---
+
+# The Tidyverse
+
+To install the suite of *tidyverse* packages use
+
+```{r install-tidyverse, eval = FALSE}
+install.packages('tidyverse')
+```
+
+To use the core *tidyverse* suite of packages in your code load the *tidyverse* package
+
+```{r load-tidyverse, eval = FALSE}
+library('tidyverse')
+```
+
+I don't recommend loading all the *tidyverse* this way though &mdash; you should get into the habit of loading only the packages you will use / need
+
+---
+
+# Tidy data
+
+> Tidy datasets provide a standardized way to link the structure of a dataset (its physical layout) with its semantics (its meaning). &mdash; **Hadley Wickham**
+
+A way to arrange data that facilitates subsequent exploration, transformation, visualization, & modelling of the data where
+
+* each column is a variable
+* each row is observation
+
+---
+
+# Reading data into R
+
+There are many ways to read data into and out of R &mdash; you don't need the Tidyverse for this
+
+* `read.csv()` for example in base R
+
+But&hellip;
+
+* if we're following the Tidy principles, or
+* we just want a cleaner, more intuitive interface
+
+then two tidyverse packages can help **readr** and **readxl**
+
+---
+
+# Packages 📦
+
+Unless you work with huge data sets or files created by subject-specific software (e.g. GIS)
+
+Data are mostly arranged in rectangular files
+
+* Plain text files (CSV, TSV, FWF) &mdash; **readr** 📦 or **vroom** 📦
+
+* Excel sheets or workbooks (Binary) &mdash; **readxl** 📦
+
+---
+
+# Reading rectangular data &mdash; *readr* 📦
+
+There are a few functions to remember for reading data
+
+* reading comma delimited files &mdash; `read_csv("file.csv")`
+
+* reading semi-colon delimited files &mdash; `read_csv2("file2.csv")`
+
+* reading files with any delimiter &mdash; `read_delim("file.txt", delim = "|")`
+
+* reading tab delimited files &mdash; `read_tsv("file.tsv")`
+
+* reading fixed-width files &mdash; `read_fwf("file.fwf", col_positions = c(1, 3, 5))`
+
+* reading files white-space-separated files &mdash; `read_table("file.txt")`
+
+---
+
+# Reading rectangular data
+
+Several common, key arguments (plus some others for special cases, like *locales*)
+
+`col_names = TRUE` &mdash; `TRUE` is the default, does the first row contain the column labels
+
+`col_names = c('a', 'b', 'c')` &mdash; give the column names to use explicitly. If you do:
+
+**Must `skip = 1L` to skip reading the first row of data**
+
+You can specify a column name as missing using `NA` &mdash; replaced with `"X1"`, `"X2"` etc
+
+---
+
+# Reading rectangular data
+
+`col_types` is the way to tell **readr** what data to expect
+
+If not supplied **readr** will guess by reading the first `guess_max` rows
+
+Can take 1 of 3 inputs
+
+1. `NULL` &mdash; the default. Guess the data types by reading the first `guess_max = 1000` rows
+
+2. A `cols()` column specification
+
+3. A string of abbreviations indicating column types
+
+---
+
+# `cols()`
+
+.row[
+
+.col-6[
+A list of column specifiers or *prototypes*
+
+```{r cols-example}
+cols(col_integer(), col_logical())
+```
+]
+
+.col-6[
+Lots of prototypes
+
+See `?cols` for the full list
+
+* `col_logical()` &mdash; `'l'`
+* `col_integer()` &mdash; `'i'`
+* `col_double()` &mdash; `'d'`
+* `col_character()` &mdash; `'c'`
+* `col_skip()` &mdash; `'_'` or `'-'`
+* `col_guess()` &mdash; `'?'`
+]
+]
+
+---
+
+# Abbreviations
+
+For data sets with many columns it is quicker to use the abbreviated form
+
+`col_types = "-iddc?"`
+
+Means
+
+* skip the first column
+* second column is an integer
+* third and fourth columns are double
+* fifth column is text/character
+* guess the sixth column
+
+---
+
+# `spec()` & `problems()`
+
+.smaller[
+```{r load-health-bad, results = 'hide', message = TRUE}
+dinocyst <- read_csv(here("data", "dinocyst-spp.csv"), skip = 2)
+problems(dinocyst)
+```
+]
+
+If **readr** encounters problems reading a file it will attempt to do it's best to read it in
+
+It will print a warning &mdash; don't ignore it! Use `problems()` to see what the problems were
+
+---
+
+# Writing rectangular data
+
+There are a few functions to remember for writing data
+
+* writing comma delimited files &mdash; `write_csv(x, "file.csv")`
+
+* writing semi-colon delimited files &mdash; `write_csv2(x, "file2.csv")`
+
+* writing files with any delimiter &mdash; `write_delim(x, "file.txt", delim = "|")`
+
+* writing tab delimited files &mdash; `write_tsv(x, "file.tsv")`
+
+* writing CSV for excel &mdash; `write_excel_csv(x, "file.csv")`
+
+---
+
+# Writing rectangular data
+
+The first argument is the object to write to disk
+
+The second argument is the path, which includes the *filename*
+
+* `path = 'file.csv'` saves `file.csv` in the current working directory
+* `path = 'output_data/file.csv'` saves `file.csv` in folder `output_data` of the working directory
+* `path = '../output_data/file.csv'` saves `file.csv` in folder `output_data` *one level up* from working directory
+* `path = here('output_data', 'file.csv')` saves `file.csv` in `output_data` folder in the project root
+
+---
+
+# Reading a writing R objects to disk
+
+**readr** provides functions to serialize R objects to disk
+
+* `read_rds('obj.rds)` reads a serialized object from disk
+
+* `write_rds(obj, 'obj.rds')` serializes `obj` to disk
+
+---
+class: inverse middle center subsection
+
+# Reading Excel sheets
+
+---
+
+# Reading Excel sheets
+
+The **readxl** package provides a small set of functions for *reading from* Excel sheets and workbooks
+
+Three main functions
+
+1. `read_xls()` reads from older Office/Excel formatted files
+2. `read_xlsx()` reads from newer Office/Excel formatted files
+3. `read_excel()` determines which type of file you have, then call one or the other of `read_xls()` or `read_xlsx()` as needed
+
+---
+
+# Reading Excel sheets
+
+To list all the sheets in a file use `excel_sheets()`
+
+```{r list-excel-sheets}
+xl_file <- here("data", "dinocyst.xlsx")
+excel_sheets(xl_file)
+```
+
+---
+
+# Reading Excel sheets
+
+Say we wanted to read sheet 2, we could
+
+```{r read-sheet-2}
+dinocyst <- read_excel(xl_file, sheet = 2, range = "A3:BT1971")
+```
+
+or by name
+
+```{r read-sheet-2-by-name}
+dinocyst <- read_excel(xl_file, sheet = "duplicate", range = "A3:BT1971")
+dinocyst
+```
+
+---
+
+# Reading Excel sheets
+
+Can use `col_types` argument to tell **readxl** what data types to expect
+
+The default is `NULL` which guess from `guess_max` rows of the data
+
+Other option is to pass it a vector of one or more of these options
+
+* `"skip"`,
+* `"guess"`,
+* `"logical"`,
+* `"numeric"`,
+* `"date"`,
+* `"text"`, or
+* `"list"`
+
+Note this is the complete list &mdash; shorter than types for **readr** and no abbreviations
+
+---
+
+# Reading Excel sheets
+
+```{r read-health-proper}
+col_types <- rep(c('text', 'numeric'), times = c(1, 71))
+(dino_xl <- read_excel(xl_file, range = "A3:BT1971", col_types = col_types))
+```
+
+---
+class: inverse middle center subsection
+
+# Working directory
+
+---
+
+# Working directory
+
+Throughout we've been specifying paths to files, either explicitly or via the **here** 📦
+
+It is important to know where working directory is
+
+In rstudio.cloud, R starts in the `project` folder
+
+Use `getwd()` to query the working directory
+
+```{r getwd}
+getwd()
+```
+
+---
+
+# Paths
+
+Refer to files with relative paths if you want to share your work / scripts easily
+
+But you still need to consider relative to what
+
+Makes sense to always work from the same root directory for a given project
+
+You should always start R in that root directory (use RStudio projects)
+
+Refer to files as relative to the project root
+
+---
+
+# `here`
+
+.row[
+
+.col-6[
+
+Helps you build relative paths
+
+Heuristics help find the base of the project
+
+* a `.here` file
+* a file matching `[.]Rproj$`
+* a `.git` file
+* ...
+
+]
+
+.col-6[
+```{r, out.width = "100%", echo = FALSE}
+knitr::include_graphics("resources/here.png")
+```
+]
+
+]
+
+```{r}
+here("data", "dinocyst-spp.csv")
+```
+
+---
+
+# Pangaea
+
+Pangaea is a well-curated data repository for the palaeo sciences
+
+The *pangaear* 📦 is an R interface to the Pangaear API
+
+Lot of functionality, but a major function is `pg_data()` to download data sets from a Pangaea DOI
+
+---
+
+# Pangaea
+
+Data from Stein *et al* JQS [10.1002/jqs.2929](https://doi.org/10.1002/jqs.2929)
+
+```{r pangaea}
+library("pangaear")
+doi <- "10.1594/PANGAEA.868790"
+ara2b <- pg_data(doi)
+```
+
+---
+
+# Pangaea &mdash; look at object
+
+```{r ara2b}
+ara2b
+```
+
+---
+
+# Pangaea &mdash; extract data
+
+```{r ara2b-2}
+ara2b_df <- ara2b[[1]]$data
+ara2b_df
+```
+

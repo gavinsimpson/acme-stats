@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>R and RStudio</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Gavin L. Simpson" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../common/css/all.css" type="text/css" />
+    <link rel="stylesheet" href="../common/css/slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: inverse, middle, left, my-title-slide, title-slide
+
+.title[
+# R and RStudio
+]
+.subtitle[
+## ACME Workshop
+]
+.author[
+### Gavin L. Simpson
+]
+
+---
+
+class: inverse middle center large-subsection
+
+
+
+
+
+# R and RStudio
+
+---
+class: inverse subsection
+background-image: url('resources/mika-baumeister-J5yoGZLdpSI-unsplash.jpg')
+background-position: center
+background-size: cover
+
+# 
+
+---
+
+# R
+
+R is a powerful software application for statistical analysis
+
+It is incredibly popular
+
+* It is open source &amp;mdash; GPL
+* Vast package ecosystem
+* Designed from the ground up for analysing data
+* Has excellent graphics capabilities
+
+R is an *interpreted* language unlike C, C++, etc
+
+Slower but more forgiving and **interactive**
+
+---
+
+# RStudio
+
+RStudio is a powerful *integrated development environment* (**IDE**) for R
+
+* an interface for running R
+* an editor for writing R scripts
+* menus &amp; buttons to run common tasks
+* a lot more
+
+It is also open source
+
+RStudio &amp;ne; R
+
+Can run RStudio on your computer or in the cloud using [rstudio.cloud](https://rstudio.cloud)
+
+Posit PBC provide paid-for support &amp; Pro-level versions for organisations
+
+---
+
+# RStudio
+
+.center[
+&lt;img src="./resources/rstudio-screenshot.png" width="2563" /&gt;
+]
+
+---
+
+# R example
+
+
+```r
+## Palmer penguins
+
+library("palmerpenguins")
+library("dplyr")
+library("ggplot2")
+
+theme_set(theme_bw())
+
+penguins %&gt;%
+    count(species)
+```
+
+```
+## # A tibble: 3 × 2
+##   species       n
+##   &lt;fct&gt;     &lt;int&gt;
+## 1 Adelie      152
+## 2 Chinstrap    68
+## 3 Gentoo      124
+```
+
+---
+
+# R example
+
+
+```r
+penguins %&gt;%
+  group_by(species) %&gt;%
+    summarize(across(where(is.numeric), mean, na.rm = TRUE))
+```
+
+```
+## # A tibble: 3 × 6
+##   species   bill_length_mm bill_depth_mm flipper_length_mm body_mass_g  year
+##   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt;
+## 1 Adelie              38.8          18.3              190.       3701. 2008.
+## 2 Chinstrap           48.8          18.4              196.       3733. 2008.
+## 3 Gentoo              47.5          15.0              217.       5076. 2008.
+```
+
+---
+
+# R example
+
+.row[
+.col-6[
+
+```r
+ggplot(penguins, aes(x = flipper_length_mm,
+                     y = body_mass_g,
+                     colour = species,
+                     shape  = species)) +
+  geom_point(size = 3) +
+  scale_colour_brewer(palette = "Set1")
+```
+]
+
+.col-6[
+![](02-r-and-rstudio_files/figure-html/penguins-plot-1.svg)&lt;!-- --&gt;
+]
+]
+
+---
+
+# R example
+
+Don't worry! You might not understand most of that!
+
+By the end of the workshop you will
+
+--
+
+We start this journey here
+
+---
+class: inverse center middle big-subsection
+
+# R basics
+
+---
+
+# Assignment
+
+`&lt;-` is the assignment operator
+
+Made up from the `&lt;` and `-` characters
+
+`output &lt;- input`
+
+Assign the **result** of the *right hand side* to the object named on the left
+
+This creates an object with name `output`
+
+Refer to objects using their name
+
+---
+
+# Data types
+
+The main data types in R are
+
+.row[
+.col-6[
+* **numeric**
+
+    * **integer**
+	* **double** (real values)
+	* **complex** (numbers with real &amp; imaginary parts)
+	
+* **character**
+
+    * strings of letters, numbers, etc
+	* create with **matched** single `'` or double `"` quotes
+]
+
+.col-6[
+* **logical**
+
+    * `TRUE` and `FALSE`
+
+    Never use `T` and `F` in their place!
+
+    `TRUE` &amp; `FALSE` are *reserved* words in R &amp;mdash; can't be overwritten &amp;mdash; but `T` and `F` aren't
+	
+
+```r
+T &lt;- FALSE # you monster!
+T == TRUE
+```
+
+```
+## [1] FALSE
+```
+]
+]
+
+---
+
+# Operators
+
+As well as `&lt;-` R has many operators
+
+.row[
+.col-6[
+* **Mathematical**
+
+    * `+`
+	* `-`
+	* `*`
+	* `/`
+]
+
+.col-6[
+
+* **Boolean**
+
+    * `&lt;` and `&gt;`
+	* `&lt;=` and `&gt;=` (`&lt;` `=` &amp; `&gt;` `=`)
+	* `==` (`=` `=`)
+	* `!=` (`!` `=`)
+	* `&amp;` AND
+	* `|` OR
+	* `!` NOT
+]
+
+]
+
+---
+
+# Getting help
+
+Can get help on R from many places
+
+Inside R use `?topic` to get help on topic `topic`
+
+Usually `topic` is a function
+
+Can search more broadly with `??topic`
+
+Other sources:
+
+* Google
+* StackOverflow &lt;https://stackoverflow.com/&gt;
+* RStudio Community &lt;https://community.rstudio.com/&gt;
+
+---
+class: inverse middle center big-subsection
+
+# Vectors
+
+---
+
+# Vectors
+
+Vectors are the fundamental way that data are stored in R
+
+R doesn't have **scalars** &amp;mdash; single values &amp;mdash;  just vectors
+
+Vectors are a one-dimensional collection of values in a single unit
+
+**Atomic** vectors are vectors whose elements are all of the same type
+
+---
+
+# Creating vectors
+
+.row[
+
+.col-6[
+Create vectors with `c()` (for **combine**)
+
+
+```r
+numbers &lt;- c(1, 4, 6, 10)
+numbers
+```
+
+```
+## [1]  1  4  6 10
+```
+
+```r
+people &lt;- c("Alice", "Bob", "Claire", "David")
+people
+```
+
+```
+## [1] "Alice"  "Bob"    "Claire" "David"
+```
+
+Number of elements via `length()`
+
+
+```r
+length(people)
+```
+
+```
+## [1] 4
+```
+]
+
+.col-6[
+Many other ways: `seq()`, `rep()`
+
+
+```r
+seq(1, 5)
+```
+
+```
+## [1] 1 2 3 4 5
+```
+
+```r
+seq(1, 10, by = 2)
+```
+
+```
+## [1] 1 3 5 7 9
+```
+
+```r
+seq(1, 2, length = 5L)
+```
+
+```
+## [1] 1.00 1.25 1.50 1.75 2.00
+```
+
+```r
+rep(c(1,2), each = 2)
+```
+
+```
+## [1] 1 1 2 2
+```
+
+```r
+rep(c(1,2), times = 2)
+```
+
+```
+## [1] 1 2 1 2
+```
+]
+]
+
+---
+
+# Vectorized operations
+
+Vectors are a power feature of R as they allow us to write more expressive code
+
+
+```r
+v1 &lt;- c(3, 1, 4, 1, 5)
+v2 &lt;- c(1, 6, 1, 8, 0)
+v1 + v2
+```
+
+```
+## [1] 4 7 5 9 5
+```
+
+In other languages, to achieve this you might have to loop (iterate) over the *indices* of the vectors to add each pair of elements in turn
+
+We'll talk more about **loops** and **iteration** later in the course
+
+---
+
+# Recycling
+
+What if we have vectors of different lengths?
+.row[
+
+.col-6[
+
+```r
+v1 &lt;- c(1, 3, 5, 1, 5)
+v2 &lt;- c(1, 2)
+v1 + v2
+```
+
+```
+## Warning in v1 + v2: longer object length is not a multiple of shorter object
+## length
+```
+
+```
+## [1] 2 5 6 3 6
+```
+
+`v2` is **recycled** until it is of the correct length
+
+]
+
+.col-6[
+.center[
+&lt;i class="fas fa-recycle fa-10x fa-yellow"&gt;&lt;/i&gt;
+]
+]
+
+]
+
+Dangerous &amp; powerful &amp;mdash; best avoided
+
+Working with **data frames** helps avoid this
+
+
+---
+
+# Recycling
+
+.center[
+&lt;img src="./resources/recycling.png" width="65%" /&gt;
+]
+
+---
+
+# Vectorized functions
+
+Most functions in R accept vectors as inputs
+
+
+```r
+v1 &lt;- c(10, 5, 2, 4)
+sum(v1)
+```
+
+```
+## [1] 21
+```
+
+```r
+prod(v1)
+```
+
+```
+## [1] 400
+```
+
+```r
+length(v1)
+```
+
+```
+## [1] 4
+```
+
+```r
+round(v1 + runif(length(v1)), 2)
+```
+
+```
+## [1] 10.31  5.13  2.90  4.23
+```
+
+---
+
+# Indexing vectors
+
+Having stored data in a vector we might want to access certain elements of the vector
+
+.row[
+
+.col-6[
+
+Use **&amp;lsqb;** plus a vector of indices to access elements of a vector
+
+
+```r
+v1
+```
+
+```
+## [1] 10  5  2  4
+```
+
+Can also use **negative** indices to **exclude** those elements
+
+]
+
+.col-6[
+
+
+```r
+v1[1]
+```
+
+```
+## [1] 10
+```
+
+```r
+v1[4]
+```
+
+```
+## [1] 4
+```
+
+```r
+v1[length(v1)]
+```
+
+```
+## [1] 4
+```
+
+```r
+v1[2:3]
+```
+
+```
+## [1] 5 2
+```
+
+```r
+v1[-c(1,3)]
+```
+
+```
+## [1] 5 4
+```
+
+]
+
+]
+
+---
+
+# Indexing vectors
+
+If we give the elements of the vector **names** we can index using those
+
+.row[
+
+.col-6[
+
+
+```r
+names(v1) &lt;- people
+v1
+```
+
+```
+##  Alice    Bob Claire  David 
+##     10      5      2      4
+```
+
+]
+
+.col-6[
+
+
+```r
+v1["Alice"]
+```
+
+```
+## Alice 
+##    10
+```
+
+```r
+people[2]
+```
+
+```
+## [1] "Bob"
+```
+
+```r
+v1[people[2]]
+```
+
+```
+## Bob 
+##   5
+```
+
+]
+
+]
+
+---
+
+# Indexing vectors
+
+We can also use a logical vector to select (`TRUE`) or exclude (`FALSE`) elements
+
+.row[
+
+.col-6[
+
+
+```r
+v1
+```
+
+```
+##  Alice    Bob Claire  David 
+##     10      5      2      4
+```
+
+```r
+filt &lt;- rep(c(TRUE, FALSE), each = 2)
+filt
+```
+
+```
+## [1]  TRUE  TRUE FALSE FALSE
+```
+
+]
+
+.col-6[
+
+
+```r
+v1[filt]
+```
+
+```
+## Alice   Bob 
+##    10     5
+```
+
+```r
+v1[!filt]
+```
+
+```
+## Claire  David 
+##      2      4
+```
+
+]
+
+]
+
+---
+
+# Indexing vectors
+
+
+.row[
+
+.col-6[
+
+Any expression that evaluates to 
+
+* numeric (possibly negative)
+* character (assuming named)
+* logical
+
+can be used to index a vector
+
+
+```r
+v1
+```
+
+```
+##  Alice    Bob Claire  David 
+##     10      5      2      4
+```
+
+
+]
+
+.col-6[
+
+Can also **assign** new values to elements
+
+
+```r
+v1[4] &lt;- 15
+v1
+```
+
+```
+##  Alice    Bob Claire  David 
+##     10      5      2     15
+```
+
+```r
+v1 &lt; 10
+```
+
+```
+##  Alice    Bob Claire  David 
+##  FALSE   TRUE   TRUE  FALSE
+```
+
+```r
+v1[v1 &lt; 10]
+```
+
+```
+##    Bob Claire 
+##      5      2
+```
+
+]
+
+]
+
+---
+class: inverse middle center big-subsection
+
+# Data frames
+
+---
+
+# What are data frames?
+
+Data frames are R's equivalent of an Excel spreadsheet
+
+Data are arranged in rows and columns
+
+* rows &amp;mdash; observations
+
+* columns &amp;mdash; variables
+
+Data frames are really lists, where each component of the list is required to be a vector of the same length
+
+Each column of the data frame can be of a difference type
+
+---
+
+# Creating data frames
+
+Use the `data.frame()` function
+
+
+```r
+people &lt;- data.frame(name   = c('Ada', 'Bob', 'Chris', 'Diya', 'Emma'),
+                     height = c(64, 74, 69, 69, 71),
+                     weight = c(135, 156, 139, 144, 152))
+people
+```
+
+```
+##    name height weight
+## 1   Ada     64    135
+## 2   Bob     74    156
+## 3 Chris     69    139
+## 4  Diya     69    144
+## 5  Emma     71    152
+```
+
+---
+
+# Investigating data frames
+
+There are many functions for working with data frames
+
+Table 10.1 in PS4DS lists several
+
+Useful functions include
+
+* `head()`
+
+* `tail()`
+
+* `nrow()`
+
+* `ncol()`
+
+---
+
+# Accessing data frames
+
+Can appear complicated because data frames are lists and matrix-like objects
+
+.row[
+
+.col-6[
+List access:
+
+* `people$height`
+* `people[['height']]`
+* `people[[2]]`
+* `people[2]`
+
+Last one extracts a data frame (list) with 1 column
+
+]
+
+.col-6[
+
+
+```r
+people$height
+```
+
+```
+## [1] 64 74 69 69 71
+```
+
+```r
+people[['height']]
+```
+
+```
+## [1] 64 74 69 69 71
+```
+
+```r
+people[[2]]
+```
+
+```
+## [1] 64 74 69 69 71
+```
+
+```r
+people[2]
+```
+
+```
+##   height
+## 1     64
+## 2     74
+## 3     69
+## 4     69
+## 5     71
+```
+
+]
+
+]
+
+---
+
+# Accessing data frames
+
+Matrix-like access
+
+Can use:
+
+* row names and column names &amp;mdash; `people['Ada', 'height']`
+
+* row &amp; column number (index) &amp;mdash; `people[2, 3]`
+
+* mixtures &amp;mdash; `people[2, 'height']`
+
+* extracting one or more rows &amp;mdash; `people[2, ]`
+
+* extracting one or more columns &amp;mdash; `people[, 'height']`
+
+* Can use numeric, character, logical indices
+
+---
+
+# Access data frames
+
+.row[
+
+.col-6[
+
+```r
+rownames(people) &lt;- people$name
+people['Ada', ]
+```
+
+```
+##     name height weight
+## Ada  Ada     64    135
+```
+
+```r
+people[, 'height']
+```
+
+```
+## [1] 64 74 69 69 71
+```
+]
+
+.col-6[
+
+```r
+people[, c('height','weight')]
+```
+
+```
+##       height weight
+## Ada       64    135
+## Bob       74    156
+## Chris     69    139
+## Diya      69    144
+## Emma      71    152
+```
+
+```r
+people[2:4, ]
+```
+
+```
+##        name height weight
+## Bob     Bob     74    156
+## Chris Chris     69    139
+## Diya   Diya     69    144
+```
+]
+
+]
+
+---
+
+# Tibbles
+
+**Tibbles** are a modern implementation of the data frame concept
+
+Widely used in the *Tidyverse* &amp;mdash; a collection of packages that all share common philosophy and approaches to working with data
+
+Coerce a data frame to be a tibble with `as_tibble()` (from **tibble** 📦)
+
+Load data directly to tibbles using the **readr**, **vroom**, &amp; **readxl** 📦📦📦
+
+---
+
+# Tibbles
+
+
+```r
+people &lt;- tibble::as_tibble(people)
+people
+```
+
+```
+## # A tibble: 5 × 3
+##   name  height weight
+##   &lt;chr&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 Ada       64    135
+## 2 Bob       74    156
+## 3 Chris     69    139
+## 4 Diya      69    144
+## 5 Emma      71    152
+```
+
+---
+
+# Tibbles
+
+.smaller[
+
+```r
+dinocyst
+```
+
+```
+## # A tibble: 0 × 72
+## # … with 72 variables: Site number &lt;lgl&gt;, Aand &lt;lgl&gt;, Atax &lt;lgl&gt;, Btep &lt;lgl&gt;,
+## #   Bspo &lt;lgl&gt;, Iacu &lt;lgl&gt;, Ipal &lt;lgl&gt;, Ipar &lt;lgl&gt;, Ipat &lt;lgl&gt;, Isph &lt;lgl&gt;,
+## #   Istr &lt;lgl&gt;, Ipli &lt;lgl&gt;, Ivel &lt;lgl&gt;, Ijap &lt;lgl&gt;, Lmac &lt;lgl&gt;, Mcho &lt;lgl&gt;,
+## #   Nlab &lt;lgl&gt;, Nrig &lt;lgl&gt;, Ocen &lt;lgl&gt;, Oisr &lt;lgl&gt;, Ojan &lt;lgl&gt;, Olon &lt;lgl&gt;,
+## #   Ogig &lt;lgl&gt;, Pzoh &lt;lgl&gt;, Pret &lt;lgl&gt;, Smem &lt;lgl&gt;, Sdel &lt;lgl&gt;, Selo &lt;lgl&gt;,
+## #   Sram &lt;lgl&gt;, Sbel &lt;lgl&gt;, Sben &lt;lgl&gt;, Sbul &lt;lgl&gt;, Slaz &lt;lgl&gt;, Smir &lt;lgl&gt;,
+## #   Sgra &lt;lgl&gt;, Spac &lt;lgl&gt;, Sspp &lt;lgl&gt;, Tpel &lt;lgl&gt;, Pdal &lt;lgl&gt;, Stri &lt;lgl&gt;, …
+```
+]
+
+---
+
+# Tibbles
+
+There are some differences
+
+* `people$name` extracts a vector as usual but *never* partial matches &amp;mdash; `people$nam` is an error
+
+* `people[ , 'height']` extracts a 1-column data frame &amp;mdash; `[r, c]` *never* drops empty dimensions
+
+* tibbles are much faster for large data sets
+
+* tibbles print differently &amp;mdash; never again swamp your R session by accidentally printing a large data frame
+
+---
+class: inverse middle center big-subsection
+
+# Functions
+
+---
+
+# Functions
+
+A **function** is
+
+1. a sequence of 1 or more **instructions** (lines of code)
+2. takes 0 or more arguments
+3. returns something (possibly nothing or `NULL`, may be invisibly)
+
+`seq()`, `length()` etc are all functions
+
+---
+
+# Arguments
+
+Functions *typically* take arguments &amp;mdash; like **flags** for the CLI commands
+
+
+```r
+v &lt;- runif(n = 5)
+
+round(v, digits = 1)
+```
+
+```
+## [1] 0.1 0.6 0.4 0.5 0.9
+```
+
+`n` is an argument to `runif`
+
+`digits` is an argument to `round`
+
+
+```r
+args(round)
+```
+
+```
+## function (x, digits = 0) 
+## NULL
+```
+
+---
+
+# Arguments
+
+Arguments can be matched by **name** or **position**
+
+
+```r
+round(x = v, digits = 1)
+```
+
+```
+## [1] 0.1 0.6 0.4 0.5 0.9
+```
+
+```r
+round(v, 1)
+```
+
+```
+## [1] 0.1 0.6 0.4 0.5 0.9
+```
+
+```r
+round(digits = 1, x = v)
+```
+
+```
+## [1] 0.1 0.6 0.4 0.5 0.9
+```
+
+```r
+round(1, v) # wrong! But not an error
+```
+
+```
+## [1] 1 1 1 1 1
+```
+
+&lt;i class="fas fa-lightbulb fa-yellow fa-tip"&gt;&lt;/i&gt; **Don't name the first argument but name everything else**
+
+---
+
+# Packages
+
+R comes with a lot of functions
+
+* implement the language for programming
+* utilities
+* mathematical
+* basic &amp; advanced statistical
+
+But it's not comprehensive
+
+R **packages** extend R with new functions that implement new statistical methods, utilities, or even entirely new *domain specific languages*
+
+R packages are user-written and work just like those provided with R
+
+---
+
+# Packages
+
+Packages are typically **installed** from CRAN
+
+**C**omprehensive **R** **A**rchive **N**etwork
+
+Packages are installed on to a computer into a **library**
+
+Install a packages using
+
+
+```r
+install.packages("pkg_name")
+```
+
+Load a package each time you want to use it with
+
+
+```r
+library("pkg_name")
+```
+
+(Other repos are available, like **GitHub**, esp for development versions)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

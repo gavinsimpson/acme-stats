@@ -1,0 +1,133 @@
+---
+title: "Palaeo Data Science"
+subtitle: "ACME Workshop"
+author: "Gavin L. Simpson"
+output:
+  xaringan::moon_reader:
+    css: ['default', 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css', '../common/css/slides.css']
+    lib_dir: libs
+    nature:
+      titleSlideClass: ['inverse','middle','left',my-title-slide]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "macros.js"
+      ratio: '16:9'
+---
+class: inverse middle center large-subsection
+
+```{r setup, include=FALSE, cache=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(cache = TRUE, dev = 'svg', echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.height=6, fig.width = 1.777777*6)
+library('xaringanExtra')
+```
+
+```{r xaringan-tile-view, echo=FALSE}
+xaringanExtra::use_tile_view()
+```
+
+# Data science
+
+---
+class: inverse subsection
+background-image: url('resources/claudio-schwarz-fyeOxvYvIyY-unsplash.jpg')
+background-position: center
+background-size: contain
+
+# 
+
+---
+
+# Data science skills
+
+.row[
+
+.col-12[
+.center[
+![:scale 55%](./resources/data-science-skills.svg)
+]
+]
+]
+
+---
+
+# Palaeo data science workflow
+
+&nbsp;
+
+.row[
+
+.col-12[
+.center[
+![:scale 100%](./resources/palaeo-data-workflow.png)
+]
+]
+]
+
+---
+
+# Workshop topics
+
+.row[
+
+.col-6[
+
+* Introduction
+
+* Palaeo Data Science
+
+* Importing Data
+
+* Data Wrangling
+
+]
+
+.col-6[
+
+* Data Visualization
+
+* Ordination
+
+* Generalized Additive Models
+
+* Transfer Functions
+
+]
+]
+
+---
+
+# Recommended text
+
+.row[
+.col-6[
+
+* Lots of good R resources
+
+* R for Data Science is recommended
+
+* https://r4ds.had.co.nz/
+
+]
+
+.col-6[
+.center[
+```{r out.width = '370px', echo = FALSE}
+knitr::include_graphics('./resources/r4ds-cover.png')
+```
+]
+]
+]
+
+---
+
+# Computing Environment
+
+rstudio
+
+.center[
+![:scale 80%](./resources/rstudio-screenshot.png)
+]
+
+

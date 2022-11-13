@@ -1,0 +1,383 @@
+---
+title: "Data wrangling with dplyr 📦"
+subtitle: "ACME Workshop"
+author: "Gavin Simpson"
+output:
+  xaringan::moon_reader:
+    css: ['default', 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css', '../common/css/all.css', '../common/css/slides.css']
+    lib_dir: libs
+    nature:
+      titleSlideClass: ['inverse','middle','left',my-title-slide]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: 'macros.js'
+      ratio: '16:9'
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(cache = TRUE, dev = "svg", echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.height=6, fig.width = 1.777777*6)
+library("dplyr")
+library("tidyr")
+library("tibble")
+library("forcats")
+library("readr")
+library("readxl")
+library("here")
+library("janitor")
+library("ggplot2")
+```
+
+
+---
+class: inverse middle center subsection
+
+# Data wrangling with **dplyr** 📦
+
+---
+
+# Data wrangling
+
+Wrangling data is (or should be) the most time-consuming aspect of a study &mdash; once collected!
+
+.row[
+
+.col-7[
+*Wrangling* defined as
+
+> engagement in a long, complicated dispute or argument
+
+> round up, herd, or take charge of (livestock)
+
+> alternative to *wangle*, to *manage to obtain (something) by persuading or cleverly manipulating someone*
+
+]
+
+.col-1[
+&nbsp;
+]
+
+.col-4[
+Better alternative to
+
+* data processing
+* data munging
+* data manipulation
+* &hellip;
+]
+]
+
+---
+
+# Data wrangling and *dplyr*
+
+The *dplyr* package provides **five** key functions to solve most of the data wrangling issues you'll face
+
+1. Choose observations (rows) based on values of variables (cols) &mdash; `filter()`
+2. Reorder the observations (rows) &mdash; `arrange()`
+3. Choose variables by name or other feature &mdash; `select()`
+4. Create new variables as functions of existing ones &mdash; `mutate()`
+5. Collapse many values into a single summary &mdash; `summarise()`
+
+Each of these functions can be used with `group_by()` so that they affect each subset of data (group) in turn
+
+These are the key data wrangling *verbs*
+
+---
+
+# Guiding principles
+
+All verbs work in the same way, providing a consistent workflow with known outputs
+
+1. the first argument to the verbs is *always* a data frame
+
+2. subsequent arguments define what you want to with the data frame
+
+3. the result of each verb (what is returned by the function) is *always* a data frame
+
+---
+
+# Global burden of dinocyst
+
+```{r load-dinocyst}
+dino <- read_excel(here("data", "dinocyst-meta.xlsx"), skip = 2,
+    na = c("", "---", "-----"))
+```
+
+```{r dinocyst-show-data, echo = TRUE}
+dino
+```
+
+---
+
+# Clean up column names
+
+```{r janitor}
+library("janitor")
+dino <- dino %>% janitor::clean_names()
+names(dino)
+```
+
+---
+
+# `filter()`
+
+Subset observations based on the values or one or more of the columns
+
+```{r dinocyst-filter-2017}
+filter(dino, coring_device == "Box corer")
+```
+
+---
+
+# The pipe `%>%`
+
+The nature of *dplyr* verbs leads to a workflow where we create intermediate steps
+
+1. group the data using `group_by()`
+2. summarise the grouped data by group using `summarise()`
+
+We perhaps don't need to store the output of the first operation
+
+The pipe operator `%>%` allows use to compose *dplyr* verbs into a workflow to achieve a data wrangling outcome
+
+---
+
+# Plot
+
+```{r gbd-2017-plot-prep}
+dino_box <- dino %>%
+    filter(coring_device == "Box corer")
+dino_box
+```
+
+---
+
+```{r gbd-2017-plot, fig.height = 4}
+ggplot(dino_box, aes(x = longitude, y = latitude, fill = dinocyst_count)) +
+    geom_point() +
+    theme(legend.position = "top") +
+    labs(x = "longitude", y = "latitude", fill = NULL) +
+    coord_map(projection = "orthographic",
+        orientation = c(40, -20, 0))
+```
+
+---
+
+# `arrange()`
+
+Sort the rows according to a condition or variable
+
+```{r dinocyst-arrange-deaths}
+arrange(dino, dinocyst_count)
+```
+
+---
+
+# `desc()`
+
+Arrange in descending order using `desc()`
+
+```{r dinocyst-arrange-rating-desc}
+arrange(dino, desc(dinocyst_count))
+```
+
+---
+
+# `select()`
+
+Choose which variables to view or work with
+
+```{r dinocyst-select, error = TRUE}
+select(dino, c(latitude, longitude, dinocyst_count))
+```
+
+---
+
+# `select()` &mdash; many options for selecting
+
+.row[
+
+.col-6[
+
+`matches()`
+
+```{r dinocyst-select-matches}
+select(dino, matches("dinocyst"))
+```
+]
+
+.col-6[
+
+`last_col()`
+
+```{r dinocyst-select-last-col}
+select(dino, last_col())
+```
+]
+]
+
+---
+
+# `select()` &mdash; many options for selecting
+
+.row[
+
+.col-6[
+
+`from:to`
+
+```{r dinocyst-select-colon}
+select(dino, latitude:coring_device)
+```
+]
+
+.col-6[
+
+`starts_with()`
+
+```{r dinocyst-select-starts-with}
+select(dino, starts_with("l"))
+```
+]
+]
+
+---
+
+# `select()` &mdash; many options for selecting
+
+Many options for choosing columns in `select` &mdash; see `?dplyr::select`
+
+---
+
+# `summarise()`
+
+Summarise data to a single row
+
+```{r dinocyst-summarise}
+dino %>% summarise(total_cysts = sum(dinocyst_count, na.rm = TRUE))
+```
+
+---
+
+# `group_by()`
+
+`summarise()` becomes much more useful if we group data first
+
+```{r dinocyst-group-by}
+dino %>%
+    group_by(coring_device) %>%
+    summarise(total_cysts = sum(dinocyst_count, na.rm = TRUE))
+```
+
+Can group by multiple variables; grouping applied in the order given
+
+---
+
+# `mutate()`
+
+Create new variable or modify existing ones
+
+```{r dinocyst-mutate}
+dino %>%
+    group_by(coring_device) %>%
+    summarise(count_per_device = sum(dinocyst_count, na.rm = TRUE)) %>%
+    mutate(total_count = sum(count_per_device)) %>% #<<
+    ungroup()
+```
+
+---
+class: inverse middle center subsection
+
+# Tidying data with *tidyr*
+
+---
+
+# Tidy data
+
+> Tidy datasets provide a standardized way to link the structure of a dataset (its physical layout) with its semantics (its meaning). &ndash; **Hadley Wickham**
+
+A way to arrange data that facilitates subsequent exploration, transformation, visualization, & modelling of the data where
+
+* each column is a variable
+* each row is observation
+
+---
+
+# Wide or long?
+
+Often store species data in wide format
+
+```{r show-dino-wide, echo = FALSE}
+library("tidyr")
+col_types <- rep(c('text', 'numeric'), times = c(1, 71))
+dino_wide <- read_excel(here("data", "dinocyst.xlsx"), range = "A3:BT1971",
+    col_types = col_types) %>%
+    rename(site = `Site number`)
+dino_wide
+```
+
+---
+
+Look at an alternative way of storing the rectangular data
+
+```{r show-gbd-wide, echo = FALSE}
+dino_long <- dino_wide %>%
+    pivot_longer(cols = Aand:Dcha, names_to = "taxon", values_to = "count")
+dino_long
+```
+
+---
+
+# Wide or long?
+
+The data are also in what we call wide format &mdash; where multiple observations are in a row
+
+To fit a statistical model we need them in long format &mdash; where each row corresponds to a single observation
+
+---
+
+# Wide or long?
+
+```{r show-wide-long-image, echo = FALSE, out.width = '80%', fig.align = 'center'}
+knitr::include_graphics('resources/original-dfs-tidy.png')
+```
+
+---
+
+# Pivoting
+
+Converting between a *wide* and *long* representations is called *pivoting*
+
+```{r show-wide-long-git, echo = FALSE, out.width = '50%', fig.align = 'center'}
+knitr::include_graphics('resources/tidyr-longer-wider.gif')
+```
+
+---
+
+# `pivot_longer()`
+
+To go from the wide version of `dino_wide` to the long form we use `pivot_longer()`
+
+```{r pivot-dinocyst-longer}
+dino_wide %>%
+    pivot_longer(cols = Aand:Dcha, # which columns to pivot
+        names_to = "taxon",        # variables to create in long form
+        values_to = "count")       # column to put the data into
+```
+
+---
+
+# `pivot_wider()`
+
+Wider forms of data tend to be easier for humans to work with outside R
+
+
+```{r pivot-dinocyst-wider}
+dino_long %>%
+    pivot_wider(names_from = taxon,      # which columns to spread out
+                values_from = count) %>% # which column to take data from
+    head()                               # show just first 6 rows
+```
