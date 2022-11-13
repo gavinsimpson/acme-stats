@@ -8,12 +8,12 @@
 
 ### Monday
 
-1. [Introduction](01-introduction.html)
+1. [Introduction](01-monday/01-introduction.html)
 
-2. [R and RStudio](02-r-and-rstudio.html)
+2. [R and RStudio](01-monday/02-r-and-rstudio.html)
 
-3. [Importing Data](03-importing-data.html)
+3. [Importing Data](01-monday/03-importing-data.html)
 
-4. [Data Wrangling](04-data-wrangling.html)
+4. [Data Wrangling](01-monday/04-data-wrangling.html)
 
-5. [Data Visualization](05-data-viz.html)
+5. [Data Visualization](01-monday/05-data-viz.html)
