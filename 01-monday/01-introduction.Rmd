@@ -98,6 +98,12 @@ background-size: contain
 
 ---
 
+# Workshop materials
+
+[gavinsimpson.github.io/acme-stats/](https://gavinsimpson.github.io/acme-stats/)
+
+---
+
 # Recommended text
 
 .row[
@@ -129,5 +135,4 @@ rstudio
 .center[
 ![:scale 80%](./resources/rstudio-screenshot.png)
 ]
-
 
