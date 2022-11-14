@@ -48,3 +48,7 @@ install.packages(c("riojaPlot", "gratia"), Ncpus = cores)
 4. [Data Wrangling](01-monday/04-data-wrangling.html)
 
 5. [Data Visualization](01-monday/05-data-viz.html)
+
+## Download materials
+
+Materials for the workshop can be downloaded from the workshop's [GitHub repo](https://github.com/gavinsimpson/acme-stats)
