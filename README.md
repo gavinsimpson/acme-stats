@@ -22,7 +22,7 @@ update.packages(ask = FALSE, Ncpus = cores)
 
 # install new packaes
 pkgs <- c("gapminder", "tidyverse", "readr", "readxl", "tidypaleo", "rioja",
-    "analogue", "vegan", "pangaear", "janitor", "palmerpenguins")
+    "analogue", "vegan", "pangaear", "janitor", "palmerpenguins", "here")
 
 install.packages(pkgs, Ncpus = cores)
 
