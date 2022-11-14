@@ -1,6 +1,6 @@
 library("pangaear")
 library("janitor")
-library("dplyr"
+library("dplyr")
 library("ggplot2")
 
 # load foram isotope data from Baffin Bay
