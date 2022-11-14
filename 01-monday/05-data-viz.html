@@ -700,7 +700,8 @@ ara2b_plot &lt;- ara2b_l %&gt;%
     geom_point() +
     scale_y_reverse() +
     facet_geochem_gridh(vars(variable)) +
-    labs(x = NULL, y = "Age [ka BP]")
+    labs(x = NULL, y = "Age [ka BP]") +
+    rotated_facet_labels()
 ```
 
 ---
@@ -713,8 +714,6 @@ ara2b_plot
 ```
 
 &lt;img src="05-data-viz_files/figure-html/tidypalaeo-plot-draw-1.svg" width="80%" style="display: block; margin: auto;" /&gt;
-
-Unfortunately, can't rotate the labels for geochem data (yet)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

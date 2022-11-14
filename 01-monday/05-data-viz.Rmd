@@ -593,7 +593,8 @@ ara2b_plot <- ara2b_l %>%
     geom_point() +
     scale_y_reverse() +
     facet_geochem_gridh(vars(variable)) +
-    labs(x = NULL, y = "Age [ka BP]")
+    labs(x = NULL, y = "Age [ka BP]") +
+    rotated_facet_labels()
 ```
 
 ---
@@ -603,5 +604,3 @@ ara2b_plot <- ara2b_l %>%
 ```{r tidypalaeo-plot-draw, out.width = "80%", fig.align="center"}
 ara2b_plot
 ```
-
-Unfortunately, can't rotate the labels for geochem data (yet)
