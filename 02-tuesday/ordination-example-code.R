@@ -25,6 +25,8 @@ nms <- names(cyst_spp) %>%
     make.cepnames() %>%
     str_to_title()
 
+cyst_spp <- setNames(cyst_spp, nms)
+
 # unconstrained ordination
 
 # pca
