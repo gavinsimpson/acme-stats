@@ -49,6 +49,14 @@ install.packages(c("riojaPlot", "gratia"), Ncpus = cores)
 
 5. [Data Visualization](https://gavinsimpson.github.io/acme-stats/01-monday/05-data-viz.html)
 
+### Tuesday
+
+1. [Ordination I](https://gavinsimpson.github.io/acme-stats/02-tusday/01-ordination-1.html)
+
+2. [Ordination I](https://gavinsimpson.github.io/acme-stats/02-tusday/01-ordination-2.html)
+
+3. [Generalized additive models](https://gavinsimpson.github.io/acme-stats/02-tusday/01-gams.html)
+
 ## Download materials
 
 Materials for the workshop can be downloaded from the workshop's [GitHub repo](https://github.com/gavinsimpson/acme-stats)
