@@ -1,5 +1,6 @@
 # Let's load the dinocyst data from pangaear
 library("vegan")
+library("stringr")
 library("pangaear")
 doi <- "10.1594/PANGAEA.908494"
 cyst_all <- pg_data(doi)
@@ -18,6 +19,11 @@ cyst_meta <- cyst_df %>%
 cyst_env <- cyst_df %>%
     select(`Distance [km] (to the coast)`:`PP C area [g/m**2/a]`) %>%
     janitor::clean_names()
+
+nms <- names(cyst_spp) %>%
+    str_replace("_percent", "") %>%
+    make.cepnames() %>%
+    str_to_title()
 
 # unconstrained ordination
 
