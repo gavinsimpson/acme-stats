@@ -53,9 +53,9 @@ install.packages(c("riojaPlot", "gratia"), Ncpus = cores)
 
 1. [Ordination I](https://gavinsimpson.github.io/acme-stats/02-tuesday/01-ordination-1.html)
 
-2. [Ordination II](https://gavinsimpson.github.io/acme-stats/02-tuesday/01-ordination-2.html)
+2. [Ordination II](https://gavinsimpson.github.io/acme-stats/02-tuesday/02-ordination-2.html)
 
-3. [Generalized additive models](https://gavinsimpson.github.io/acme-stats/02-tuesday/01-gams.html)
+3. [Generalized additive models](https://gavinsimpson.github.io/acme-stats/02-tuesday/03-gams.html)
 
 ## Download materials
 
