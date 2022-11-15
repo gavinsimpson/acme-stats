@@ -19,7 +19,7 @@ cleaned <- ara2b_df %>%
     mutate(neg_age = - age_ka_bp)
 
 # fit a smooth of `neg_age`
-m <- gam(brassicasterol_toc_mg_g ~ s(neg_age), data = cleaned,
+m <- gam(brassicasterol_toc_mg_g ~ s(neg_age, k = 20), data = cleaned,
     method = "REML")
 
 # model diagnostics
