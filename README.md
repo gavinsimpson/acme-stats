@@ -57,6 +57,10 @@ install.packages(c("riojaPlot", "gratia"), Ncpus = cores)
 
 3. [Generalized additive models](https://gavinsimpson.github.io/acme-stats/02-tuesday/03-gams.html)
 
+### Wednesday
+
+1. [Transfer functions](https://gavinsimpson.github.io/acme-stats/03-tuesday/tranfun_talk_2.pdf)
+
 ## Download materials
 
 Materials for the workshop can be downloaded from the workshop's [GitHub repo](https://github.com/gavinsimpson/acme-stats)
