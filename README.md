@@ -59,7 +59,7 @@ install.packages(c("riojaPlot", "gratia"), Ncpus = cores)
 
 ### Wednesday
 
-1. [Transfer functions](https://gavinsimpson.github.io/acme-stats/03-tuesday/tranfun_talk_2.pdf)
+1. [Transfer functions](https://gavinsimpson.github.io/acme-stats/03-wednesday/tranfun_talk_2.pdf)
 
 ## Download materials
 
