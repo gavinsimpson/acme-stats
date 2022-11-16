@@ -1,0 +1,5 @@
+\beamer@sectionintoc {2}{Motivating Examples}{3}{0}{1}
+\beamer@sectionintoc {3}{Introduction}{5}{0}{2}
+\beamer@sectionintoc {4}{Weighted Averaging}{10}{0}{3}
+\beamer@sectionintoc {5}{Modern Analogue Technique}{19}{0}{4}
+\beamer@sectionintoc {6}{Model performance and diagnostics}{36}{0}{5}

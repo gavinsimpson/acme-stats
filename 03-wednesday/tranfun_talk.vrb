@@ -1,0 +1,21 @@
+\frametitle{Sample-specific error estimates}
+    \scriptsize
+\begin{Schunk}
+\begin{Sinput}
+\protect \begingroup \immediate \write \@unused   \def \MessageBreak  
+ \let \protect \edef  You may provide a definition with\MessageBreak \DeclareUnicodeCharacter   \errhelp \let \def \MessageBreak  
+(inputenc)                 \def   \errmessage  Package inputenc Error: Unicode character ^^[ (U+001B)\MessageBreak not set up for use with LaTeX.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help   \endgroup [0;34mr$>\protect \begingroup \immediate \write \@unused   \def \MessageBreak  
+ \let \protect \edef  You may provide a definition with\MessageBreak \DeclareUnicodeCharacter   \errhelp \let \def \MessageBreak  
+(inputenc)                 \def   \errmessage  Package inputenc Error: Unicode character ^^[ (U+001B)\MessageBreak not set up for use with LaTeX.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help   \endgroup [0m reconPlot(rlgh.boot, use.labels = TRUE, ylab = "pH", xlab = "Depth (cm.)", display.error = "bars", predictions = "bootstrap")
+\end{Sinput}
+\end{Schunk}
+    \normalsize
+    \begin{center}
+        \includegraphics[width=11cm]{sample_specific_error_plot}
+    \end{center}
